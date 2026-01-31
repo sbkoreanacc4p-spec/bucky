@@ -1,0 +1,142 @@
+{
+  "design_system": {
+    "identity": {
+      "name": "Neo-Fintech Dashboard",
+      "archetype": "Electric & Neon + Performance Pro",
+      "vibe": "Futuristic, High-Contrast, Data-Centric",
+      "principles": [
+        "Fusion over Imitation: Mix financial rigor with gaming UI aesthetics",
+        "Emotion First: Green isn't just color, it's growth. Red isn't just error, it's alert.",
+        "Content is King: Data is the hero. Charts take center stage.",
+        "Contrast: High contrast for readability in dark mode."
+      ]
+    },
+    "typography": {
+      "font_family": {
+        "headings": "Outfit, sans-serif",
+        "body": "Manrope, sans-serif",
+        "mono": "JetBrains Mono, monospace"
+      },
+      "scale": {
+        "h1": "text-4xl md:text-5xl font-bold tracking-tight",
+        "h2": "text-3xl font-semibold tracking-tight",
+        "h3": "text-2xl font-semibold",
+        "body": "text-base leading-relaxed",
+        "small": "text-sm text-muted-foreground",
+        "tiny": "text-xs uppercase tracking-wider font-medium"
+      },
+      "weights": {
+        "regular": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700
+      }
+    },
+    "colors": {
+      "mode": "dark",
+      "palette": {
+        "background": "#09090b",
+        "foreground": "#fafafa",
+        "card": "#121212",
+        "card_foreground": "#ffffff",
+        "primary": "#3b82f6",
+        "primary_foreground": "#ffffff",
+        "secondary": "#27272a",
+        "secondary_foreground": "#fafafa",
+        "accent": "#8b5cf6",
+        "success": "#10b981",
+        "warning": "#f59e0b",
+        "danger": "#ef4444",
+        "border": "#27272a",
+        "input": "#27272a",
+        "ring": "#3b82f6"
+      },
+      "gradients": {
+        "primary": "bg-gradient-to-r from-blue-600 to-violet-600",
+        "success": "bg-gradient-to-r from-emerald-500 to-teal-500",
+        "danger": "bg-gradient-to-r from-red-500 to-pink-500",
+        "surface": "bg-gradient-to-b from-white/5 to-transparent"
+      }
+    },
+    "layout": {
+      "grid_system": "Bento Grid Mode B (High Density)",
+      "container": "max-w-7xl mx-auto p-4 md:p-8",
+      "spacing": {
+        "section_gap": "gap-8",
+        "card_padding": "p-6",
+        "internal_gap": "gap-4"
+      },
+      "radius": "rounded-xl"
+    },
+    "components": {
+      "cards": {
+        "style": "Glassmorphism or Solid with 1px border",
+        "classes": "bg-card/50 backdrop-blur-xl border border-white/10 shadow-xl"
+      },
+      "buttons": {
+        "primary": "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20",
+        "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        "ghost": "hover:bg-accent hover:text-accent-foreground"
+      },
+      "inputs": {
+        "style": "Minimal, high contrast border on focus",
+        "classes": "bg-background/50 border-input focus:ring-2 focus:ring-primary/50"
+      }
+    },
+    "motion": {
+      "library": "framer-motion",
+      "animations": {
+        "entrance": {
+          "initial": { "opacity": 0, "y": 20 },
+          "animate": { "opacity": 1, "y": 0 },
+          "transition": { "duration": 0.4, "ease": "easeOut" }
+        },
+        "hover": {
+          "scale": 1.02,
+          "transition": { "duration": 0.2 }
+        }
+      }
+    },
+    "visual_enhancers": {
+      "glassmorphism": "backdrop-blur-md bg-black/40 border border-white/10",
+      "gradients": "Use subtle radial gradients in background to create depth",
+      "shadows": "shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+    },
+    "assets": {
+      "icons": "lucide-react",
+      "images": [
+        {
+          "category": "background",
+          "url": "https://images.unsplash.com/photo-1768327239584-e97d004f1830?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "description": "Abstract neon financial data visualization dark background",
+          "usage": "Hero section background or subtle overlay"
+        },
+        {
+          "category": "user_profile",
+          "url": "https://images.pexels.com/photos/2330137/pexels-photo-2330137.jpeg",
+          "description": "Professional user profile portrait",
+          "usage": "Sidebar or Header user avatar"
+        }
+      ]
+    }
+  },
+  "implementation_guide": {
+    "steps": [
+      "1. Setup Theme: Configure Tailwind for dark mode class and add custom colors.",
+      "2. Install Dependencies: framer-motion, recharts, lucide-react, date-fns, clsx, tailwind-merge.",
+      "3. Create Layout: Implement the Bento Grid layout with a sidebar/topbar structure.",
+      "4. Build Components: Create reusable Card, StatCard, and ChartContainer components.",
+      "5. Integrate Charts: Use Recharts for Line (Income/Spend) and Pie (Categories) charts.",
+      "6. Build Tables: Create a data table with sorting and filtering.",
+      "7. Add Interactivity: Implement the date range picker and theme toggle.",
+      "8. Polish: Add entrance animations and hover effects."
+    ],
+    "universal_guidelines": [
+      "Do not use generic centered layouts.",
+      "Use 2-3x more spacing than typical designs.",
+      "Ensure all interactive elements have hover states.",
+      "Use 'sonner' for toasts.",
+      "Add data-testid to all interactive elements."
+    ]
+  }
+}
