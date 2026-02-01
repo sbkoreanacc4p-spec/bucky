@@ -190,6 +190,7 @@ async def create_bulk_income(income_records: List[IncomeCreate]):
 @api_router.get("/statistics")
 async def get_statistics():
     """Get summary statistics"""
+    # Optimized queries with projections
     spendings = await db.spendings.find({}, {"_id": 0, "amount": 1}).to_list(10000)
     income_records = await db.income.find({}, {"_id": 0, "income": 1, "saved": 1, "home": 1}).to_list(1000)
     
