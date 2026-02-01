@@ -78,7 +78,7 @@ async def get_spendings():
     spendings = await db.spendings.find({}, {"_id": 0}).to_list(10000)
     return spendings
 
-@api_router.post("/spendings", response_model=Spending)
+@api_router.post("/spendings", response_model=Spending, status_code=201)
 async def create_spending(spending: SpendingCreate):
     """Create a new spending record"""
     spending_obj = Spending(**spending.model_dump())
@@ -133,7 +133,7 @@ async def get_income():
     income_records = await db.income.find({}, {"_id": 0}).to_list(1000)
     return income_records
 
-@api_router.post("/income", response_model=Income)
+@api_router.post("/income", response_model=Income, status_code=201)
 async def create_income(income: IncomeCreate):
     """Create a new income record"""
     # Check if month already exists
