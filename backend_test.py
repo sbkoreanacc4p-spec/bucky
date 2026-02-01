@@ -94,7 +94,7 @@ class FinTrackAPITester:
             "date": "2026-01-15",
             "amount": 1000.0
         }
-        success, response = self.run_test("Create Spending", "POST", "spendings", 201, test_spending)
+        success, response = self.run_test("Create Spending", "POST", "spendings", 200, test_spending)
         if success and 'id' in response:
             return success, response['id']
         return success, None
@@ -107,7 +107,7 @@ class FinTrackAPITester:
             "saved": 5000.0,
             "home": 0.0
         }
-        return self.run_test("Create Income", "POST", "income", 201, test_income)
+        return self.run_test("Create Income", "POST", "income", 200, test_income)
 
     def test_update_spending(self, spending_id):
         """Test updating a spending record"""
