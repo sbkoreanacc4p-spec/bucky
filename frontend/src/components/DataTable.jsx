@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronUp, ChevronDown, Search, Download } from 'lucide-react';
+import { ChevronUp, ChevronDown, Search, Download, Trash2 } from 'lucide-react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import {
@@ -12,12 +12,26 @@ import {
   TableRow,
 } from './ui/table';
 import { ScrollArea } from './ui/scroll-area';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from './ui/alert-dialog';
+import { toast } from 'sonner';
 import { formatCurrency, getMonthName } from '../lib/data';
+import { deleteSpending, deleteIncome } from '../lib/api';
 
-export const SpendingsTable = ({ data, onExport }) => {
+export const SpendingsTable = ({ data, onRefresh }) => {
   const [sortField, setSortField] = useState('date');
   const [sortDirection, setSortDirection] = useState('desc');
   const [searchTerm, setSearchTerm] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -25,6 +39,19 @@ export const SpendingsTable = ({ data, onExport }) => {
     } else {
       setSortField(field);
       setSortDirection('desc');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    setDeletingId(id);
+    try {
+      await deleteSpending(id);
+      toast.success('Spending deleted successfully');
+      onRefresh?.();
+    } catch (error) {
+      toast.error('Failed to delete spending');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -76,6 +103,7 @@ export const SpendingsTable = ({ data, onExport }) => {
     a.download = 'spendings_export.csv';
     a.click();
     window.URL.revokeObjectURL(url);
+    toast.success('Spendings exported to CSV');
   };
 
   return (
@@ -133,11 +161,12 @@ export const SpendingsTable = ({ data, onExport }) => {
               >
                 Amount <SortIcon field="amount" />
               </TableHead>
+              <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAndSortedData.map((item, index) => (
-              <TableRow key={`${item.date}-${item.category}-${index}`}>
+            {filteredAndSortedData.map((item) => (
+              <TableRow key={item.id}>
                 <TableCell className="font-medium">{item.category}</TableCell>
                 <TableCell className="text-muted-foreground">
                   {new Date(item.date).toLocaleDateString('en-GB', {
@@ -148,6 +177,37 @@ export const SpendingsTable = ({ data, onExport }) => {
                 </TableCell>
                 <TableCell className="text-right font-mono">
                   {formatCurrency(item.amount)}
+                </TableCell>
+                <TableCell>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-muted-foreground hover:text-red-500"
+                        data-testid={`delete-spending-${item.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Spending?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete this spending record ({item.category} - {formatCurrency(item.amount)}).
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDelete(item.id)}
+                          className="bg-red-500 hover:bg-red-600"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </TableCell>
               </TableRow>
             ))}
@@ -162,14 +222,29 @@ export const SpendingsTable = ({ data, onExport }) => {
   );
 };
 
-export const IncomeTable = ({ data, onExport }) => {
+export const IncomeTable = ({ data, onRefresh }) => {
+  const [deletingMonth, setDeletingMonth] = useState(null);
+
+  const handleDelete = async (month) => {
+    setDeletingMonth(month);
+    try {
+      await deleteIncome(month);
+      toast.success('Income record deleted successfully');
+      onRefresh?.();
+    } catch (error) {
+      toast.error('Failed to delete income record');
+    } finally {
+      setDeletingMonth(null);
+    }
+  };
+
   const exportToCSV = () => {
     const headers = ['Month', 'Income (IQD)', 'Saved (IQD)', 'Home (IQD)'];
     const rows = data.map(item => [
       item.month,
       item.income,
-      item.saved,
-      item.home
+      item.saved || 0,
+      item.home || 0
     ]);
     
     const csvContent = [headers, ...rows]
@@ -183,7 +258,13 @@ export const IncomeTable = ({ data, onExport }) => {
     a.download = 'income_export.csv';
     a.click();
     window.URL.revokeObjectURL(url);
+    toast.success('Income exported to CSV');
   };
+
+  // Sort by month descending
+  const sortedData = useMemo(() => {
+    return [...data].sort((a, b) => b.month.localeCompare(a.month));
+  }, [data]);
 
   return (
     <motion.div
@@ -214,10 +295,11 @@ export const IncomeTable = ({ data, onExport }) => {
               <TableHead className="text-right">Income</TableHead>
               <TableHead className="text-right">Saved</TableHead>
               <TableHead className="text-right">Home</TableHead>
+              <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item) => (
+            {sortedData.map((item) => (
               <TableRow key={item.month}>
                 <TableCell className="font-medium">
                   {getMonthName(item.month)}
@@ -230,6 +312,37 @@ export const IncomeTable = ({ data, onExport }) => {
                 </TableCell>
                 <TableCell className="text-right font-mono text-amber-500">
                   {item.home > 0 ? formatCurrency(item.home) : '-'}
+                </TableCell>
+                <TableCell>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-muted-foreground hover:text-red-500"
+                        data-testid={`delete-income-${item.month}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Income Record?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete the income record for {getMonthName(item.month)}.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDelete(item.month)}
+                          className="bg-red-500 hover:bg-red-600"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </TableCell>
               </TableRow>
             ))}
